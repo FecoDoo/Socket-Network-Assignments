@@ -7,7 +7,7 @@ OBJECTS = $(wildcard *.o)
 all: myget 
 
 myget: webc.o
-	$(CC) webc.o -o myget -lcurl
+	$(CC) webc.o -l curl -o myget
 
 
 ### Build stuff

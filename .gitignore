@@ -6,3 +6,8 @@ TCP/sendto
 TCP/receivemetcp.o
 TCP/sendmetcp.o
 TCP/TCP.zip
+
+# HTTP
+HTTP/webc.o
+HTTP/webc
+HTTP/myget
