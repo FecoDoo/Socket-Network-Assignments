@@ -1,3 +1,9 @@
-This is a test file.
-And this is second line.
-This is third line without any descriptions.
+Write an application that accepts a file name and a IP:PORT and a filename as arguments. The application should open the file, connect to the IP:PORT, transfer and count all the bytes of the file to the receiver.
+
+Once the last byte has been transferred, it should close its connection. It should then print the number of transferred bytes and how long time the transfer took, in micro-seconds (us) (10^-6).
+
+Write an corresponding server, that listens to an PORT (at runtime from command line). Once a client has connected, the client will send an arbitrary long byte stream, the server should count the number of received bytes. Once the client has sent the last byte, it will close its connection. When the server receives the last message, it will write to STDOUT a string formatted as: 
+
+Connection time  (unix time) | Client IP:port (DNS name, if available other wise N/A) | Transfer size (bytes) | Transfer Rate (bps) | Duration (s)
+
+The server should be able to handle multiple clients simultaneously, if you solve it via threads, fork or select is up to you.
