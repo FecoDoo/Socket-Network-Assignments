@@ -1,1 +1,8 @@
 .vscode/
+
+# TCP Folder
+TCP/receive
+TCP/sendto
+TCP/receivemetcp.o
+TCP/sendmetcp.o
+TCP/TCP.zip
