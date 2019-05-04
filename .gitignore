@@ -1,5 +1,5 @@
 /.vscode/
-
+*.zip
 # TCP Folder
 TCP/receive
 TCP/sendto
