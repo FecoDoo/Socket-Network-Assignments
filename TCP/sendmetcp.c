@@ -69,8 +69,8 @@ int main(int argc, char *argv[]){
 	char** tokens;
 	FILE *fptr;
 	
-	if (argc != 4) {
-		fprintf(stderr,"usage: %s <HOSTNAME> <PORT> <FILENAME>\n",argv[0]);
+	if (argc != 3) {
+		fprintf(stderr,"usage: %s <HOSTNAME:PORT> <FILENAME>\n",argv[0]);
 		exit(1);
 	}
 
@@ -80,21 +80,30 @@ int main(int argc, char *argv[]){
 	hints.ai_socktype = SOCK_STREAM;
 	
 	// 准备文件属性
-	//char delim[] = ":";
-	// char *Desthost=strtok(argv[1],delim);
-	// char *Destport=strtok(NULL,delim);
-	char *Desthost=argv[1];
-	char *Destport=argv[2];
-	char *filename=argv[3];
+	char delim[] = ":";
+	char *Desthost=strtok(argv[1],delim);
+	char *Destport=strtok(NULL,delim);
+	// char *Desthost=argv[1];
+	// char *Destport=argv[2];
+	char *filename=argv[2];
 	int totalBytes = 0;
+
+	// 判断是否本地
+	if (!strcmp(Desthost, "localhost")){	
+	} else if (!strcmp(Desthost,"127.0.0.1")){
+	} else {
+		fprintf(stderr,"Dest host not found.\n");
+		exit(1);
+	}
+	
 	// 打开文件
 	fptr = fopen(filename,"r");
 	if(fptr == NULL){
 		// 文件不存在
-        perror("File Not Found\n");
-        exit(1);
+			perror("File Not Found\n");
+			exit(1);
     } else {
-		printf("File %s is sending to %s:%s \n",filename,Desthost,Destport);
+		printf("Opening %s sending to %s:%s \n",filename,Desthost,Destport);
 	
 		// 判断连接
 		if ((rv = getaddrinfo(argv[1], Destport, &hints, &serverinfo)) != 0) {
@@ -123,14 +132,14 @@ int main(int argc, char *argv[]){
 			return 2;
 		}
 		inet_ntop(p->ai_family, get_in_addr((struct sockaddr *)p->ai_addr),s, sizeof s);
-		printf("Client connecting to %s\n", s);
+		printf("Connected, Sending, ");
 
 		freeaddrinfo(serverinfo);
 
 		// 发送文件
-        gettimeofday(&GTOD_before,NULL);
+		gettimeofday(&GTOD_before,NULL);
 
-        bzero(buffer, MAXDATASIZE);
+		bzero(buffer, MAXDATASIZE);
 
 		//int totalBytes = 0;
 		int tempBytes = 0;
@@ -165,9 +174,9 @@ int main(int argc, char *argv[]){
 	timeval_subtract(&difference,&GTOD_after,&GTOD_before);
 
 	if (difference.tv_sec > 0) {
-		printf("Total bytes %d sended and Time used: %ld s %06ld ms [us].\n", totalBytes, difference.tv_sec, difference.tv_usec);
+		printf("Sent %d bytes, in %ld.%06ld us.\n", totalBytes, difference.tv_sec, difference.tv_usec);
 	} else {
-		printf("Total bytes %d sended and Time used: %6ld ms [us].\n", totalBytes, difference.tv_usec);
+		printf("Sent %d bytes, in %06ld us.\n", totalBytes, difference.tv_usec);
 	}
 
 	return 0;

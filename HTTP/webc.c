@@ -2,10 +2,10 @@
 #include <curl/curl.h>
 
 // 保存并打印内容
-// static size_t writeCallback(void *contents, size_t size, size_t nitems, FILE *file) {
-//   fprintf(stdout,"%s",contents);
-//   return fwrite(contents, size, nitems, file);
-// }
+static size_t writeCallback(void *contents, size_t size, size_t nitems, FILE *file) {
+  fprintf(stdout,"%s",contents);
+  return fwrite(contents, size, nitems, file);
+}
 
 // 打印报头
 // static size_t header(char* b, size_t size, size_t nitems, void *userdata) {
@@ -32,11 +32,6 @@ int main(int argc, char* argv[])
     curl = curl_easy_init();
 
     if(curl) {
-
-        // curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
-        // curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
-
-
 
         // URL
         long response_code;
@@ -67,6 +62,13 @@ int main(int argc, char* argv[])
             exit(1);
         }
 
+        FILE *fp=fopen("save.txt","w");
+        if (!fp) {
+            fprintf(stderr, "Could not open output file.\n");
+            return 1;
+        }
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
 
         // Start performing
         res = curl_easy_perform(curl);

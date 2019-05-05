@@ -104,6 +104,7 @@ int main(int argc, char *argv[]){
 		fprintf(stderr,"usage: %s <PORT>\n",argv[0]);
 		exit(1);
 	}
+	
 	int PORT = atoi(argv[1]);
 
 	// Do something
@@ -125,31 +126,31 @@ int main(int argc, char *argv[]){
 
 	while(1) {
 		// parent process waiting to accept a new connection
-		printf("\n------------server waiting for new client connection------------\n");
+		// printf("\n------------server waiting for new client connection------------\n");
 		clientAddressLength=sizeof(clientAddress);
 		connfd=accept(listenfd,(struct sockaddr*)&clientAddress,&clientAddressLength);
-		printf("accept = %d \n", connfd );
+		// printf("accept = %d \n", connfd );
 		childCnt++;
-		printf("listener: got packet from %s:%d\n",
-		inet_ntop(clientAddress.sin_family,get_in_addr((struct sockaddr *)&clientAddress),
-			s, sizeof s),ntohs(clientAddress.sin_port));
+		// printf("listener: got packet from %s:%d\n",
+		inet_ntop(clientAddress.sin_family,get_in_addr((struct sockaddr *)&clientAddress),s, sizeof s),ntohs(clientAddress.sin_port);
 		
 		// child process is created for serving each new clients
 		pid=fork();
     
 		// child process rec and send
 		if(pid==0){
-			//rceive from client
+			gettimeofday(&GTOD_before,NULL);
+			// rceive from client
 			get_ip_str((struct sockaddr*)&clientAddress,&cli,&clientAddressLength);
 			int totalBytes = 0;
 			while(1){
-				gettimeofday(&GTOD_before,NULL);
+				
 				n=recv(connfd,buffer,MAXDATASIZE,0);
 				if(n == -1){
 					perror("Receive error. \n");
 					exit(1);
 				} else if (n == 0){
-					printf("Connection closed. RESULTS:\n");
+					// printf("Connection closed. RESULTS:\n");
 					
 					break;
 				}
@@ -162,23 +163,24 @@ int main(int argc, char *argv[]){
 			timeval_subtract(&difference,&GTOD_after,&GTOD_before);
 			
 			// 输出
-			printf("%s:%d | ",cli,ntohs(clientAddress.sin_port));
 			if (difference.tv_sec > 0) {
-				printf("Connection time : %ld s %06ld ms [unix time] | ", difference.tv_sec, difference.tv_usec);
-				printf("Transfer size (%d) | ",totalBytes);
-				printf("Transfer Rate (%f bps) | ",(float)totalBytes/(float)difference.tv_sec);
-				printf("Duration (%ld.%06ld s)\n",difference.tv_sec, difference.tv_usec);
+				fprintf(stdout,"%d | ",GTOD_before);
+				fprintf(stdout,"%s:%d (localhost) | ",cli,ntohs(clientAddress.sin_port));
+				fprintf(stdout,"%d | ",totalBytes);
+				fprintf(stdout,"%d | ",(int)(totalBytes/(difference.tv_sec+0.000001*difference.tv_usec)));
+				fprintf(stdout,"%ld.%06ld s",difference.tv_sec, difference.tv_usec);
 			} else {
-				printf("Connection time : %6ld ms [unix time] | ", difference.tv_usec);
-				printf("Transfer size (%d) | ",totalBytes);
-				printf("Transfer Rate (%f bps) | ",1000*(float)totalBytes/(float)difference.tv_usec);
-				printf("Duration (%ld.%06ld s)\n",difference.tv_sec, difference.tv_usec);
+				fprintf(stdout,"%d | ",GTOD_before);
+				fprintf(stdout,"%s:%d (localhost) | ",cli,ntohs(clientAddress.sin_port));
+				fprintf(stdout,"%d | ",totalBytes);
+				printf("%d | ",(int)(totalBytes/(difference.tv_usec*0.000001)));
+				printf("%06ld s\n",difference.tv_usec);
 			}
 			
 			continue;
 			//exit(0);
 		} else {
-			printf("Parent, close connfd().\n");
+			// printf("Parent, close connfd().\n");
 			close(connfd); // sock is closed BY PARENT
 		}
   }
