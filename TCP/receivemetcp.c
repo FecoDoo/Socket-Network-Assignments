@@ -109,7 +109,7 @@ int main(int argc, char *argv[]){
 
 	// Do something
 	bzero(buffer,MAXDATASIZE);
-	buffer[MAXDATASIZE-1]='\n';
+	// buffer[MAXDATASIZE-1]='\n';
 
 	// create socket
 	listenfd=socket(AF_INET,SOCK_STREAM,0);
@@ -122,7 +122,7 @@ int main(int argc, char *argv[]){
 	// bind the socket with the server address and port
 	bind(listenfd,(struct sockaddr *)&serverAddress, sizeof(serverAddress));
 	// listen for connection from client
-	listen(listenfd,5);
+	listen(listenfd,10);
 
 	while(1) {
 		// parent process waiting to accept a new connection
@@ -144,7 +144,6 @@ int main(int argc, char *argv[]){
 			get_ip_str((struct sockaddr*)&clientAddress,&cli,&clientAddressLength);
 			int totalBytes = 0;
 			while(1){
-				
 				n=recv(connfd,buffer,MAXDATASIZE,0);
 				if(n == -1){
 					perror("Receive error. \n");
@@ -154,9 +153,7 @@ int main(int argc, char *argv[]){
 					
 					break;
 				}
-				totalBytes += n;
-				
-				//printf("Child[%d] (%s:%d): recv(%d) : %s\n", childCnt,cli,ntohs(clientAddress.sin_port),n,buffer);
+				totalBytes += n;				
 				bzero(buffer, MAXDATASIZE);
 			}
 			gettimeofday(&GTOD_after,NULL);

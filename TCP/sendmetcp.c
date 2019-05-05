@@ -83,8 +83,6 @@ int main(int argc, char *argv[]){
 	char delim[] = ":";
 	char *Desthost=strtok(argv[1],delim);
 	char *Destport=strtok(NULL,delim);
-	// char *Desthost=argv[1];
-	// char *Destport=argv[2];
 	char *filename=argv[2];
 	int totalBytes = 0;
 
@@ -98,13 +96,12 @@ int main(int argc, char *argv[]){
 	
 	// 打开文件
 	fptr = fopen(filename,"r");
-	if(fptr == NULL){
+	if (fptr == NULL) {
 		// 文件不存在
-			perror("File Not Found\n");
-			exit(1);
+		perror("File Not Found\n");
+		exit(1);
     } else {
-		printf("Opening %s sending to %s:%s \n",filename,Desthost,Destport);
-	
+		fprintf(stdout,"Opening %s sending to %s:%s \n",filename,Desthost,Destport);
 		// 判断连接
 		if ((rv = getaddrinfo(argv[1], Destport, &hints, &serverinfo)) != 0) {
 			fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
@@ -151,7 +148,11 @@ int main(int argc, char *argv[]){
 				exit(1);
 			}
 			// 发送文件
-			numbytes = send(sockfd, buffer, MAXDATASIZE-1, 0);
+			if (tempBytes < MAXDATASIZE -1){
+				numbytes = send(sockfd, buffer, tempBytes, 0);
+			} else {
+				numbytes = send(sockfd, buffer, MAXDATASIZE-1, 0);
+			}
 			if(numbytes == -1 ){
 				perror("Sending error.\n");
 				exit(1);
@@ -169,7 +170,7 @@ int main(int argc, char *argv[]){
 	fclose(fptr);
 	close(sockfd);
 	
-	gettimeofday(&GTOD_after,NULL); 
+	gettimeofday(&GTOD_after,NULL);
 	
 	timeval_subtract(&difference,&GTOD_after,&GTOD_before);
 
